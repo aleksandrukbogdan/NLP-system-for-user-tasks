@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проект: Интеллектуальный ассистент поддержки</title>
+    <style>
+        /* --- 1. БАЗОВЫЕ СТИЛИ И ШРИФТЫ --- */
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-color: #0A0A0A;
+            --text-color: #F0F0F0;
+            --text-secondary: #A0A0A0;
+            --accent-color: #4C82F7;
+            --surface-color: #141414;
+            --border-color: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* --- 2. СТИЛИЗАЦИЯ СЦЕН (СЛАЙДОВ) --- */
+        .section {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 3rem 4rem;
+            position: relative;
+        }
+        
+        /* --- 3. ТИПОГРАФИКА --- */
+        .main-title {
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .main-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-top: 1.5rem;
+        }
+        
+        .case-header {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        /* --- 4. ШАБЛОНЫ ДЛЯ КЕЙСА --- */
+        .case-container {
+            width: 100%;
+            max-width: 1300px;
+            text-align: left;
+        }
+
+        .three-column-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .info-card {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .info-card h3 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        
+        .tech-stack-wrapper {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .tech-stack-item {
+            background: #2a2a2a;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- 5. НОВЫЙ ШАБЛОН ДЛЯ АРХИТЕКТУРЫ --- */
+        .architecture-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            width: 100%;
+        }
+        .arch-card {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .arch-card h3 { font-size: 1.8rem; color: var(--accent-color); margin-bottom: 1rem; }
+        .arch-card p { font-size: 1rem; line-height: 1.7; color: var(--text-secondary); }
+
+        /* --- 6. НОВЫЙ ШАБЛОН ДЛЯ ЛОГИКИ --- */
+        .logic-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .logic-step-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: left;
+        }
+        .logic-step-card h3 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        .logic-step-card span {
+            font-size: 1rem;
+            color: var(--accent-color);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .logic-step-card p {
+             font-size: 1rem;
+             line-height: 1.6;
+             color: var(--text-secondary);
+             margin-top: 1rem;
+        }
+
+        /* --- 7. ШАБЛОН ДЛЯ МЕТРИК И УЛУЧШЕНИЙ --- */
+        .metrics-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            width: 100%;
+            max-width: 1200px;
+            text-align: left;
+        }
+        .metrics-column h3, .improvements-column h3 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+        .kpi-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .kpi-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+         .kpi-card .label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        .improvement-point p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        .improvement-point p strong {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 900px) {
+            .three-column-layout, .architecture-layout, .logic-grid-layout, .metrics-layout { 
+                grid-template-columns: 1fr; 
+            }
+        }
+
+        /* --- 8. НАЧАЛЬНОЕ СОСТОЯНИЕ ДЛЯ АНИМАЦИЙ --- */
+        .anim-element {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <main>
+        <!-- СЦЕНА 1: ВСТУПЛЕНИЕ -->
+        <section id="intro" class="section">
+            <h1 class="main-title anim-element">Интеллектуальный ассистент поддержки сотрудников</h1>
+            <p class="main-subtitle anim-element">Презентация проекта</p>
+        </section>
+
+        <!-- СЦЕНА 2: ПРОБЛЕМА -->
+        <section id="problem" class="section">
+            <div class="case-container" style="text-align: center;">
+                <h2 class="case-header anim-element">Какую проблему решает проект?</h2>
+                <div class="three-column-layout">
+                    <div class="info-card anim-element">
+                        <h3>Снижает нагрузку</h3>
+                        <p>Автоматизирует ответы на часто задаваемые вопросы, освобождая время специалистов для более сложных задач.</p>
+                    </div>
+                    <div class="info-card anim-element">
+                        <h3>Ускоряет решение</h3>
+                        <p>Предоставляет точную информацию 24/7 без ожидания ответа оператора, повышая продуктивность сотрудников.</p>
+                    </div>
+                    <div class="info-card anim-element">
+                        <h3>Централизует знания</h3>
+                        <p>Собирает всю разрозненную документацию (инструкции, памятки, каталоги) в единую, доступную для поиска базу.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЦЕНА 3: АРХИТЕКТУРА -->
+        <section id="architecture" class="section">
+            <div class="case-container" style="text-align: center;">
+                <h2 class="case-header anim-element">Архитектура и технологии</h2>
+                <div class="architecture-layout">
+                    <div class="arch-card anim-element">
+                        <h3>База знаний</h3>
+                        <p>Хранит документы в виде векторов для поиска по смысловой близости.</p>
+                        <div class="tech-stack-wrapper" style="justify-content: center;">
+                            <div class="tech-stack-item">ChromaDB</div>
+                            <div class="tech-stack-item">Sentence Transformers</div>
+                        </div>
+                    </div>
+                    <div class="arch-card anim-element">
+                        <h3>Backend (Сервер)</h3>
+                        <p>Принимает запросы от пользователей и управляет всей логикой системы.</p>
+                        <div class="tech-stack-wrapper" style="justify-content: center;">
+                            <div class="tech-stack-item">Python</div>
+                            <div class="tech-stack-item">FastAPI</div>
+                        </div>
+                    </div>
+                    <div class="arch-card anim-element">
+                        <h3>Мозг (LLM)</h3>
+                        <p>Понимает естественный язык и генерирует человекопонятный ответ.</p>
+                        <div class="tech-stack-wrapper" style="justify-content: center;">
+                            <div class="tech-stack-item">GigaChat</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- СЦЕНА 4: ЛОГИКА -->
+        <section id="logic" class="section">
+             <div class="case-container" style="text-align: center;">
+                <h2 class="case-header anim-element">Логика обработки запроса: "Путь одного вопроса"</h2>
+                <div class="logic-grid-layout">
+                    <div class="logic-step-card anim-element">
+                        <span>Шаг 1</span>
+                        <h3>Приоритетный поиск</h3>
+                        <p>Ищем ответ в Каталоге ИТ-услуг. Если найден — сразу отвечаем, гарантируя стандартное решение.</p>
+                    </div>
+                     <div class="logic-step-card anim-element">
+                        <span>Шаг 2</span>
+                        <h3>Общий поиск</h3>
+                        <p>Если в каталоге ничего нет, ищем во всей остальной базе знаний (инструкции, памятки).</p>
+                    </div>
+                     <div class="logic-step-card anim-element">
+                        <span>Шаг 3</span>
+                        <h3>Интеллектуальная маршрутизация</h3>
+                        <p>Если ответа нет, классифицируем запрос по смыслу и направляем в профильный отдел (HR, бухгалтерия).</p>
+                    </div>
+                     <div class="logic-step-card anim-element">
+                        <span>Шаг 4</span>
+                        <h3>Передача специалисту</h3>
+                        <p>Если классифицировать не удалось, передаем запрос оператору и логируем для будущего анализа и дообучения.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- НОВАЯ СЦЕНА 5: МЕТРИКИ И УЛУЧШЕНИЯ -->
+        <section id="metrics" class="section">
+            <div class="case-container" style="text-align: center;">
+                <h2 class="case-header anim-element">Результаты и точки роста</h2>
+                <div class="metrics-layout">
+                    <div class="metrics-column">
+                        <h3 class="anim-element">Текущие метрики</h3>
+                        <div class="kpi-card anim-element">
+                            <div class="value">Минимальный</div>
+                            <div class="label">Уровень нагрузки</div>
+                        </div>
+                        <div class="kpi-card anim-element">
+                            <div class="value">92%</div>
+                            <div class="label">Точность маршрутизации</div>
+                        </div>
+                         <div class="kpi-card anim-element">
+                            <div class="value">&lt; 2 сек</div>
+                            <div class="label">Среднее время ответа</div>
+                        </div>
+                    </div>
+                    <div class="improvements-column">
+                        <h3 class="anim-element">Как улучшить программу?</h3>
+                        <div class="improvement-point anim-element">
+                            <p><strong>Предоставить данные с хорошей разметкой.</strong> Набор данных "вопрос-ответ-отдел" позволит нам дообучить модель-классификатор и повысить точность маршрутизации до 98-99%.</p>
+                        </div>
+                        <div class="improvement-point anim-element" style="margin-top: 2rem;">
+                            <p><strong>Расширение базы знаний.</strong> Регулярный анализ нераспознанных запросов и добавление соответствующих инструкций в базу позволит постоянно повышать уровень автоматизации.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЦЕНА 6: ЭФФЕКТИВНОСТЬ -->
+        <section id="effectiveness" class="section">
+            <div class="case-container" style="text-align: center;">
+                <h2 class="case-header anim-element">Почему это эффективно?</h2>
+                <div class="three-column-layout">
+                    <div class="info-card anim-element">
+                        <h3>Гарантия качества</h3>
+                        <p>Приоритезация ответов из каталога ИТ-услуг обеспечивает предоставление наиболее точной и проверенной информации.</p>
+                    </div>
+                    <div class="info-card anim-element">
+                        <h3>Контекстное понимание</h3>
+                        <p>Система не просто ищет ключевые слова, а понимает контекст и смысл запроса, что резко повышает точность ответов.</p>
+                    </div>
+                    <div class="info-card anim-element">
+                        <h3>Потенциал к самообучению</h3>
+                        <p>Логирование нераспознанных запросов создает основу для будущего улучшения системы и постоянного дополнения базы знаний.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- СЦЕНА 7: ЗАКЛЮЧЕНИЕ -->
+        <section id="outro" class="section">
+            <h1 class="main-title anim-element">Интеллектуальная поддержка</h1>
+            <p class="main-subtitle anim-element">Новый стандарт эффективности</p>
+        </section>
+    </main>
+
+
+    <!-- --- СКРИПТЫ АНИМАЦИИ --- -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollToPlugin);
+
+        const sections = document.querySelectorAll(".section");
+        let currentSection = 0;
+        let isAnimating = false;
+
+        function goToSection(index) {
+            if (isAnimating || index < 0 || index >= sections.length) return;
+            isAnimating = true;
+            
+            gsap.to(sections[currentSection].querySelectorAll('.anim-element'), {
+                opacity: 0,
+                y: -30,
+                duration: 0.5,
+                stagger: 0.1
+            });
+
+            gsap.to(window, {
+                scrollTo: { y: sections[index], autoKill: false },
+                duration: 1.2,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    isAnimating = false;
+                    currentSection = index;
+                    gsap.to(sections[currentSection].querySelectorAll('.anim-element'), {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        stagger: 0.15,
+                        delay: 0.2
+                    });
+                }
+            });
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (isAnimating) return;
+            const direction = e.deltaY > 0 ? 1 : -1;
+            goToSection(currentSection + direction);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (isAnimating) return;
+            let nextSection = currentSection;
+            if (e.key === "ArrowDown") nextSection++;
+            else if (e.key === "ArrowUp") nextSection--;
+            goToSection(nextSection);
+        });
+
+        function init() {
+            gsap.to(sections[0].querySelectorAll('.anim-element'), {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                stagger: 0.2,
+                delay: 0.5
+            });
+        }
+
+        init();
+
+    </script>
+</body>
+</html>

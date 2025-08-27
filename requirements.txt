@@ -1,0 +1,11 @@
+fastapi
+chromadb
+pydantic
+gigachain
+langchain
+python-dotenv
+tiktoken
+python-docx
+pandas
+openpyxl
+PyMuPDF

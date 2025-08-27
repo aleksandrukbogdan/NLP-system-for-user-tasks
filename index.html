@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интеллектуальный помощник Газстройпром</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 80%;
+            max-width: 800px;
+            height: 90vh;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #0078D4;
+            color: white;
+            padding: 16px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user .message-bubble {
+            background-color: #E1F0FF;
+            align-self: flex-end;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .message.bot .message-bubble {
+            background-color: #F1F1F1;
+            align-self: flex-start;
+            border-radius: 15px 15px 15px 0;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 18px;
+            line-height: 1.5;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .message.user .message-sender {
+            text-align: right;
+            color: #005A9E;
+        }
+
+        .message.bot .message-sender {
+            color: #444;
+        }
+
+        .message-source {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 8px;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+
+        #send-button {
+            padding: 12px 25px;
+            border: none;
+            background-color: #0078D4;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #send-button:hover {
+            background-color: #005A9E;
+        }
+
+        .loading-indicator {
+            display: none;
+            align-self: flex-start;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .loading-indicator span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #0078D4;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-indicator .bounce1 { animation-delay: -0.32s; }
+        .loading-indicator .bounce2 { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Стили для кнопок-подсказок */
+        .suggestions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 20px;
+            justify-content: flex-start;
+        }
+
+        .suggestion-button {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .suggestion-button:hover {
+            background-color: #0078D4;
+            color: white;
+            border-color: #005A9E;
+        }
+
+        /* Стили для кнопки "не получил ответ" */
+        .fallback-container {
+            display: flex;
+            justify-content: flex-start;
+            padding: 5px 20px 10px;
+        }
+        .fallback-button {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            border-radius: 15px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+        .fallback-button:hover {
+            background-color: #f5c6cb;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Ваш интеллектуальный ассистент</div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Сообщения будут добавляться сюда -->
+        </div>
+        <div class="loading-indicator" id="loading-indicator">
+            <span class="bounce1"></span>
+            <span class="bounce2"></span>
+            <span class="bounce3"></span>
+        </div>
+        <form id="chat-form" class="input-container">
+            <input type="text" id="user-input" placeholder="Введите ваш вопрос...">
+            <button type="submit" id="send-button">Отправить</button>
+        </form>
+    </div>
+
+    <script>
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Предотвращаем перезагрузку страницы
+        askQuestion();
+    });
+
+    function showLoadingIndicator() {
+        document.getElementById('loading-indicator').style.display = 'flex';
+    }
+
+    function hideLoadingIndicator() {
+        document.getElementById('loading-indicator').style.display = 'none';
+    }
+
+    function askQuestion() {
+        const userInput = document.getElementById('user-input');
+        const query = userInput.value.trim();
+
+        if (query === '') return;
+
+        appendMessage('user', query, null, null, false);
+        userInput.value = '';
+
+        // Очищаем предыдущие кнопки-подсказки
+        clearButtons();
+        
+        showLoadingIndicator();
+
+        fetch('http://127.0.0.1:8000/ask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query: query })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            hideLoadingIndicator();
+            const { answer, source, suggestions = [], show_fallback_button = false } = data;
+            appendMessage('bot', answer, source, query, show_fallback_button);
+
+            // Если есть подсказки, отображаем их в виде кнопок
+            if (suggestions.length > 0) {
+                showSuggestions(suggestions);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            hideLoadingIndicator();
+            appendMessage('bot', 'Произошла ошибка при обработке вашего запроса. Пожалуйста, проверьте консоль для деталей.');
+        });
+    }
+
+    // Функция для отображения кнопок с подсказками
+    function showSuggestions(suggestions) {
+        const chatMessages = document.getElementById('chat-messages');
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.className = 'suggestions-container';
+
+        suggestions.forEach(suggestionText => {
+            const button = document.createElement('button');
+            button.className = 'suggestion-button';
+            button.innerText = suggestionText;
+            button.onclick = () => {
+                const userInput = document.getElementById('user-input');
+                userInput.value = suggestionText;
+                askQuestion();
+            };
+            suggestionsContainer.appendChild(button);
+        });
+
+        chatMessages.appendChild(suggestionsContainer);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Функция для очистки предыдущих подсказок и кнопок
+    function clearButtons() {
+        document.querySelectorAll('.suggestions-container, .fallback-container').forEach(el => el.remove());
+    }
+
+    // Функция для вызова fallback-сценария
+    function triggerFallback(originalQuery) {
+        clearButtons();
+        showLoadingIndicator();
+
+        fetch('http://127.0.0.1:8000/fallback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: originalQuery })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingIndicator();
+            const { answer, source } = data;
+            appendMessage('bot', answer, source, null, false); // Последний ответ, кнопка не нужна
+        })
+        .catch(error => {
+            console.error('Ошибка при вызове fallback:', error);
+            hideLoadingIndicator();
+            appendMessage('bot', 'Произошла ошибка при обработке вашего запроса.', null, false);
+        });
+    }
+
+    // Главная функция добавления сообщения в чат
+    function appendMessage(sender, text, source, originalQuery, show_fallback_button) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+
+        let messageHtml = `
+            <div class="message-bubble">
+                <div class="message-sender">${sender === 'user' ? 'Вы' : 'Ассистент'}</div>
+                <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
+        `;
+
+        if (source && source !== "Не определен") {
+            messageHtml += `<div class="message-source">Источник: ${source}</div>`;
+        }
+
+        messageHtml += `</div>`;
+        messageDiv.innerHTML = messageHtml;
+        chatMessages.appendChild(messageDiv);
+
+        // Добавляем кнопку "не получил ответ" если нужно
+        if (show_fallback_button && sender === 'bot') {
+            const fallbackContainer = document.createElement('div');
+            fallbackContainer.className = 'fallback-container';
+            const fallbackButton = document.createElement('button');
+            fallbackButton.className = 'fallback-button';
+            fallbackButton.innerText = 'Я не получил нужный ответ';
+            fallbackButton.onclick = () => triggerFallback(originalQuery);
+            fallbackContainer.appendChild(fallbackButton);
+            chatMessages.appendChild(fallbackContainer);
+        }
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    </script>
+</body>
+</html>
