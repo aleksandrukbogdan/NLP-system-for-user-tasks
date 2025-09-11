@@ -6,8 +6,8 @@ import datetime
 import logging
 from collections import defaultdict
 
-from database import find_similar_documents
-from gigachat import get_gigachat_response
+from .database import find_similar_documents
+from .gigachat import get_gigachat_response
 
 # --- Настройка логирования для нераспознанных запросов ---
 # Определяем абсолютный путь к папке с логами для надежности
