@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./web
+    ports:
+      - '3000:3000'
+    environment:
+      - REACT_APP_CHATBOT_A_URL=http://chatbot-a:5000
+      - REACT_APP_CHATBOT_B_URL=http://chatbot-b:8000
+    depends_on:
+      - chatbot-a
+      - chatbot-b
+  chatbot-a:
+    build: ./bot_technical_specification
+    ports:
+      - '5000:5000'
+  chatbot-b:
+    build: ./bot_NLP_system
+    ports:
+      - '8000:8000'

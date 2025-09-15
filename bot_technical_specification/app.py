@@ -9,6 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 import logging
 import re
 import sys
+import json
 from gigachat import GigaChat
 
 # Настройка логирования с правильной кодировкой
@@ -164,6 +165,71 @@ def create_docx_from_chat(filename, messages):
         logging.error(f"Ошибка создания DOCX из чата: {str(e)}")
         return False
 
+def log_analytics(chat_messages):
+    """Логирование аналитики по завершенным задачам"""
+    try:
+        analytics_file = 'analytics.json'
+        analytics_data = []
+        if os.path.exists(analytics_file):
+            with open(analytics_file, 'r', encoding='utf-8') as f:
+                analytics_data = json.load(f)
+
+        analytics_data.append({
+            'timestamp': datetime.now().isoformat(),
+            'message_count': len(chat_messages),
+        })
+
+        with open(analytics_file, 'w', encoding='utf-8') as f:
+            json.dump(analytics_data, f, ensure_ascii=False, indent=4)
+
+        logging.info("Аналитика по задаче успешно записана.")
+    except Exception as e:
+        logging.error(f"Ошибка записи аналитики: {str(e)}")
+
+@app.route('/api/analytics', methods=['GET'])
+def get_analytics():
+    """Отдает данные для дашборда аналитики"""
+    try:
+        analytics_file = 'analytics.json'
+        if os.path.exists(analytics_file):
+            with open(analytics_file, 'r', encoding='utf-8') as f:
+                raw_data = json.load(f)
+
+            total_tasks = len(raw_data)
+            if total_tasks == 0:
+                return jsonify({"success": True, "data": {
+                    'total_tasks': 0,
+                    'avg_messages_per_task': 0,
+                    'tasks_per_day': {},
+                    'raw_data': []
+                }})
+
+            total_messages = sum(item['message_count'] for item in raw_data)
+            avg_messages_per_task = total_messages / total_tasks
+
+            tasks_per_day = {}
+            for item in raw_data:
+                day = datetime.fromisoformat(item['timestamp']).strftime('%Y-%m-%d')
+                tasks_per_day[day] = tasks_per_day.get(day, 0) + 1
+
+            processed_analytics = {
+                'total_tasks': total_tasks,
+                'avg_messages_per_task': round(avg_messages_per_task, 2),
+                'tasks_per_day': tasks_per_day,
+                'raw_data': raw_data
+            }
+            return jsonify({"success": True, "data": processed_analytics})
+        else:
+            return jsonify({"success": True, "data": {
+                'total_tasks': 0,
+                'avg_messages_per_task': 0,
+                'tasks_per_day': {},
+                'raw_data': []
+            }})
+    except Exception as e:
+        logging.error(f"Ошибка чтения файла аналитики: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     try:
@@ -217,6 +283,7 @@ def chat():
                 docx_filepath = os.path.join(DOCX_DIR, docx_filename)
 
                 if create_docx_from_chat(docx_filepath, messages):
+                    log_analytics(messages)
                     # Добавляем ссылку на скачивание в ответ
                     download_url = f"/downloads/{docx_filename}"
                     final_response = f"{bot_response}\n[Скачать документ]({download_url})"
